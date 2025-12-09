@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 class Complex {
 private:
@@ -119,6 +120,62 @@ public:
     }
 };
 
+struct OperationRecord {
+    std::string operation;
+    Complex num1;
+    Complex num2;
+    Complex result;
+    
+    OperationRecord(const std::string& op, const Complex& n1, const Complex& n2, const Complex& res)
+        : operation(op), num1(n1), num2(n2), result(res) {}
+    
+    OperationRecord(const std::string& op, const Complex& n1, const Complex& res)
+        : operation(op), num1(n1), num2(0, 0), result(res) {}
+    
+    void display() const {
+        if (num2.getReal() == 0 && num2.getImag() == 0) {
+            std::cout << operation << " " << num1 << " = " << result;
+        } else {
+            std::cout << num1 << " " << operation << " " << num2 << " = " << result;
+        }
+        std::cout << std::endl;
+    }
+};
+
+class Calculator {
+private:
+    std::vector<OperationRecord> history;
+    
+public:
+    // Добавление записи в историю
+    void addToHistory(const OperationRecord& record) {
+        history.push_back(record);
+    }
+    
+    // Просмотр истории операций
+    void viewHistory() const {
+        if (history.empty()) {
+            std::cout << "История операций пуста." << std::endl;
+            return;
+        }
+        
+        std::cout << "\n=== История операций ===" << std::endl;
+        for (size_t i = 0; i < history.size(); ++i) {
+            std::cout << i + 1 << ". ";
+            history[i].display();
+        }
+        std::cout << "========================\n" << std::endl;
+    }
+    
+    // Очистка истории
+    void clearHistory() {
+        history.clear();
+        std::cout << "История операций очищена." << std::endl;
+    }
+    
+};
+
+
 int Complex::count = 0;
 
 int main() {
@@ -151,6 +208,20 @@ int main() {
     std::cout << "c1 < c2: " << (c1 < c2 ? "true" : "false") << std::endl;
     std::cout << "c1 > c2: " << (c1 > c2 ? "true" : "false") << std::endl;
     std::cout << "c1 == c3: " << (c1 == c3 ? "true" : "false") << std::endl;
+
+    // Тестирование с записью в историю
+    Calculator calc;
+    Complex result = c1 + c2;
+    calc.addToHistory(OperationRecord("+", c1, c2, result));
+    
+    result = ++c1;
+    calc.addToHistory(OperationRecord("++", c1, result));
+    
+    result = c1 * c2;
+    calc.addToHistory(OperationRecord("*", c1, c2, result));
+    
+    // Просмотр истории
+    calc.viewHistory();
     
     return 0;
 }
