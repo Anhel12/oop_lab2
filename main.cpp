@@ -172,7 +172,161 @@ public:
         history.clear();
         std::cout << "История операций очищена." << std::endl;
     }
+
+    void performOperations() {
+        int choice;
+        Complex num1, num2, result;
+        
+        do {
+            displayMenu();
+            std::cout << "Выберите операцию: ";
+            std::cin >> choice;
+            
+            switch (choice) {
+                case 1: { // Сложение
+                    std::cout << "\n--- Сложение ---" << std::endl;
+                    num1 = inputComplex("Введите первое число:");
+                    num2 = inputComplex("Введите второе число:");
+                    result = num1 + num2;
+                    std::cout << "Результат: " << num1 << " + " << num2 << " = " << result << std::endl;
+                    addToHistory(OperationRecord("+", num1, num2, result));
+                    break;
+                }
+                case 2: { // Вычитание
+                    std::cout << "\n--- Вычитание ---" << std::endl;
+                    num1 = inputComplex("Введите первое число:");
+                    num2 = inputComplex("Введите второе число:");
+                    result = num1 - num2;
+                    std::cout << "Результат: " << num1 << " - " << num2 << " = " << result << std::endl;
+                    addToHistory(OperationRecord("-", num1, num2, result));
+                    break;
+                }
+                case 3: { // Умножение
+                    std::cout << "\n--- Умножение ---" << std::endl;
+                    num1 = inputComplex("Введите первое число:");
+                    num2 = inputComplex("Введите второе число:");
+                    result = num1 * num2;
+                    std::cout << "Результат: " << num1 << " * " << num2 << " = " << result << std::endl;
+                    addToHistory(OperationRecord("*", num1, num2, result));
+                    break;
+                }
+                case 4: { // Деление
+                    std::cout << "\n--- Деление ---" << std::endl;
+                    num1 = inputComplex("Введите первое число:");
+                    num2 = inputComplex("Введите второе число:");
+                    try {
+                        result = num1 / num2;
+                        std::cout << "Результат: " << num1 << " / " << num2 << " = " << result << std::endl;
+                        addToHistory(OperationRecord("/", num1, num2, result));
+                    } catch (const std::runtime_error& e) {
+                        std::cout << "Ошибка: " << e.what() << std::endl;
+                    }
+                    break;
+                }
+                case 5: { // Инкремент
+                    std::cout << "\n--- Инкремент (++x) ---" << std::endl;
+                    num1 = inputComplex("Введите число:");
+                    Complex original = num1;
+                    result = ++num1;
+                    std::cout << "Результат: ++" << original << " = " << result << std::endl;
+                    addToHistory(OperationRecord("++(префикс)", original, result));
+                    break;
+                }
+                case 6: { // Декремент
+                    std::cout << "\n--- Декремент (--x) ---" << std::endl;
+                    num1 = inputComplex("Введите число:");
+                    Complex original = num1;
+                    result = --num1;
+                    std::cout << "Результат: --" << original << " = " << result << std::endl;
+                    addToHistory(OperationRecord("--(префикс)", original, result));
+                    break;
+                }
+                case 7: { // Сравнение
+                    std::cout << "\n--- Сравнение модулей ---" << std::endl;
+                    num1 = inputComplex("Введите первое число:");
+                    num2 = inputComplex("Введите второе число:");
+                    std::cout << "|" << num1 << "| = " << num1.modulus() << std::endl;
+                    std::cout << "|" << num2 << "| = " << num2.modulus() << std::endl;
+                    
+                    if (num1 == num2) {
+                        std::cout << "Модули чисел равны" << std::endl;
+                    } else if (num1 < num2) {
+                        std::cout << "Модуль первого числа меньше" << std::endl;
+                    } else {
+                        std::cout << "Модуль первого числа больше" << std::endl;
+                    }
+                    addToHistory(OperationRecord("сравнение", num1, num2, 
+                        Complex(std::max(num1.modulus(), num2.modulus()), 0)));
+                    break;
+                }
+                case 8: { // Унарный минус
+                    std::cout << "\n--- Унарный минус ---" << std::endl;
+                    num1 = inputComplex("Введите число:");
+                    result = -num1;
+                    std::cout << "Результат: -" << num1 << " = " << result << std::endl;
+                    addToHistory(OperationRecord("унарный -", num1, result));
+                    break;
+                }
+                case 9: { // Модуль
+                    std::cout << "\n--- Модуль числа ---" << std::endl;
+                    num1 = inputComplex("Введите число:");
+                    double mod = num1.modulus();
+                    std::cout << "Модуль " << num1 << " = " << mod << std::endl;
+                    addToHistory(OperationRecord("модуль", num1, Complex(mod, 0)));
+                    break;
+                }
+                case 10: // История
+                    viewHistory();
+                    break;
+                case 11: // Очистка истории
+                    clearHistory();
+                    break;
+                case 0: // Выход
+                    std::cout << "Выход из программы." << std::endl;
+                    break;
+                default:
+                    std::cout << "Неверный выбор. Попробуйте снова." << std::endl;
+            }
+            
+            if (choice != 0 && choice != 10 && choice != 11) {
+                pause();
+            }
+            
+        } while (choice != 0);
+    }
     
+private:
+    void displayMenu() const {
+        std::cout << "\n=== Калькулятор комплексных чисел ===" << std::endl;
+        std::cout << "1. Сложение" << std::endl;
+        std::cout << "2. Вычитание" << std::endl;
+        std::cout << "3. Умножение" << std::endl;
+        std::cout << "4. Деление" << std::endl;
+        std::cout << "5. Инкремент (++x)" << std::endl;
+        std::cout << "6. Декремент (--x)" << std::endl;
+        std::cout << "7. Сравнение модулей" << std::endl;
+        std::cout << "8. Унарный минус" << std::endl;
+        std::cout << "9. Вычисление модуля" << std::endl;
+        std::cout << "10. Просмотр истории операций" << std::endl;
+        std::cout << "11. Очистка истории операций" << std::endl;
+        std::cout << "0. Выход" << std::endl;
+    }
+    
+    Complex inputComplex(const std::string& prompt) {
+        double real, imag;
+        std::cout << prompt << std::endl;
+        std::cout << "  Действительная часть: ";
+        std::cin >> real;
+        std::cout << "  Мнимая часть: ";
+        std::cin >> imag;
+        return Complex(real, imag);
+    }
+    
+    void pause() {
+        std::cout << "\nНажмите Enter для продолжения...";
+        std::cin.ignore();
+        std::cin.get();
+    }
 };
 
 
@@ -194,7 +348,7 @@ int main() {
     std::cout << "После c2--: c2 = " << c2 << std::endl;
     std::cout << "-c1 = " << -c1 << std::endl;
 
-    std::cout << "Тест арифметических операторов:" << std::endl;
+    std::cout << "\nТест арифметических операторов:" << std::endl;
     std::cout << "c1 + c2 = " << c1 + c2 << std::endl;
     std::cout << "c1 - c2 = " << c1 - c2 << std::endl;
     std::cout << "c1 * c2 = " << c1 * c2 << std::endl;
@@ -222,6 +376,8 @@ int main() {
     
     // Просмотр истории
     calc.viewHistory();
+
+    calc.performOperations();
     
     return 0;
 }
