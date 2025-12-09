@@ -5,11 +5,14 @@ class Complex {
 private:
     double real;
     double imag;
+    static int count;
 
 public:
     // Конструкторы
-    Complex() : real(0), imag(0) {}
-    Complex(double r, double i = 0) : real(r), imag(i) {}
+    Complex() : real(0), imag(0) {count++;}
+    Complex(double r, double i = 0) : real(r), imag(i) {count++;}
+    // Деструктор
+    ~Complex(){count--;}
     
     // Геттеры
     double getReal() const { return real; }
@@ -37,7 +40,38 @@ public:
         }
         return os;
     }
+
+   
+    // ++complex (увеличиваем действительную часть)
+    Complex& operator++() {
+        ++real;
+        return *this;
+    }
+    // complex++ (постфиксный)
+    Complex operator++(int) {
+        Complex temp = *this;
+        ++real;
+        return temp;
+    }
+    // --complex (уменьшаем действительную часть)
+    Complex& operator--() {
+        --real;
+        return *this;
+    }
+    // complex-- (постфиксный)
+    Complex operator--(int) {
+        Complex temp = *this;
+        --real;
+        return temp;
+    }
+    
+    // Унарный минус
+    Complex operator-() const {
+        return Complex(-real, -imag);
+    }
 };
+
+int Complex::count = 0;
 
 int main() {
     Complex c1(3, 4);
@@ -46,6 +80,12 @@ int main() {
     std::cout << "c1 = " << c1 << std::endl;
     std::cout << "c2 = " << c2 << std::endl;
     std::cout << "Модуль c1 = " << c1.modulus() << std::endl;
+
+    std::cout << "\nТест унарных операторов:" << std::endl;
+    std::cout << "++c1 = " << ++c1 << std::endl;
+    std::cout << "c2-- = " << c2-- << std::endl;
+    std::cout << "После c2--: c2 = " << c2 << std::endl;
+    std::cout << "-c1 = " << -c1 << std::endl;
     
     return 0;
 }
