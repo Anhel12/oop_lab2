@@ -2,33 +2,88 @@
 #include <cmath>
 #include <vector>
 
+/**
+ * @class Complex
+ * @brief Класс для представления комплексных чисел
+ * 
+ * Класс представляет комплексное число вида a + bi, где a - действительная часть,
+ * b - мнимая часть, i - мнимая единица. Реализованы основные математические операции
+ * и перегрузки операторов.
+ */
 class Complex {
 private:
-    double real;
-    double imag;
-    static int count;
+    double real;        ///< Действительная часть комплексного числа
+    double imag;        ///< Мнимая часть комплексного числа
+    static int count;   ///< Статический счетчик созданных объектов
 
 public:
-    // Конструкторы
+    /**
+     * @brief Конструктор по умолчанию
+     * 
+     * Создает комплексное число 0 + 0i
+     */
     Complex() : real(0), imag(0) {count++;}
+
+    /**
+     * @brief Конструктор с параметрами
+     * @param r Действительная часть
+     * @param i Мнимая часть (по умолчанию 0)
+     */
     Complex(double r, double i = 0) : real(r), imag(i) {count++;}
-    // Деструктор
+
+    /**
+     * @brief Деструктор
+     * 
+     * Уменьшает счетчик объектов при уничтожении
+     */
     ~Complex(){count--;}
     
-    // Геттеры
+    /**
+     * @brief Возвращает действительную часть
+     * @return Действительная часть комплексного числа
+     */
     double getReal() const { return real; }
+    
+    /**
+     * @brief Возвращает мнимую часть
+     * @return Мнимая часть комплексного числа
+     */
     double getImag() const { return imag; }
     
-    // Сеттеры
+    /**
+     * @brief Устанавливает действительную часть
+     * @param r Новое значение действительной части
+     */
     void setReal(double r) { real = r; }
+    
+    /**
+     * @brief Устанавливает мнимую часть
+     * @param i Новое значение мнимой части
+     */
     void setImag(double i) { imag = i; }
     
-    // Модуль комплексного числа
+    /**
+     * @brief Вычисляет модуль комплексного числа
+     * @return Модуль комплексного числа
+     * 
+     * Формула: √(real² + imag²)
+     */
     double modulus() const {
         return std::sqrt(real * real + imag * imag);
     }
     
-    // Вывод комплексного числа
+    /**
+     * @brief Оператор вывода комплексного числа в поток
+     * @param os Выходной поток
+     * @param c Комплексное число для вывода
+     * @return Ссылка на выходной поток
+     * 
+     * Форматы вывода:
+     * - Если imag = 0: выводится только real
+     * - Если real = 0: выводится imag + "i"
+     * - Если imag > 0: "real + imag i"
+     * - Если imag < 0: "real - |imag| i"
+     */
     friend std::ostream& operator<<(std::ostream& os, const Complex& c) {
         if (c.imag == 0) {
             os << c.real;
@@ -42,49 +97,100 @@ public:
         return os;
     }
 
-   
-    // ++complex (увеличиваем действительную часть)
+    /**
+     * @brief Префиксный инкремент (++complex)
+     * @return Ссылка на измененный объект
+     * 
+     * Увеличивает действительную часть на 1
+     */
     Complex& operator++() {
         ++real;
         return *this;
     }
-    // complex++ (постфиксный)
+    
+    /**
+     * @brief Постфиксный инкремент (complex++)
+     * @return Копия объекта до инкремента
+     * 
+     * Увеличивает действительную часть на 1,
+     * возвращает старое значение
+     */
     Complex operator++(int) {
         Complex temp = *this;
         ++real;
         return temp;
     }
-    // --complex (уменьшаем действительную часть)
+    
+    /**
+     * @brief Префиксный декремент (--complex)
+     * @return Ссылка на измененный объект
+     * 
+     * Уменьшает действительную часть на 1
+     */
     Complex& operator--() {
         --real;
         return *this;
     }
-    // complex-- (постфиксный)
+    
+    /**
+     * @brief Постфиксный декремент (complex--)
+     * @return Копия объекта до декремента
+     * 
+     * Уменьшает действительную часть на 1,
+     * возвращает старое значение
+     */
     Complex operator--(int) {
         Complex temp = *this;
         --real;
         return temp;
     }
     
-    // Унарный минус
+    /**
+     * @brief Унарный минус
+     * @return Новый объект с противоположными знаками обеих частей
+     */
     Complex operator-() const {
         return Complex(-real, -imag);
     }
 
-    // Бинарные арифметические операторы
+    /**
+     * @brief Сложение комплексных чисел
+     * @param other Второе слагаемое
+     * @return Результат сложения
+     */
     Complex operator+(const Complex& other) const {
         return Complex(real + other.real, imag + other.imag);
     }
     
+    /**
+     * @brief Вычитание комплексных чисел
+     * @param other Вычитаемое
+     * @return Результат вычитания
+     */
     Complex operator-(const Complex& other) const {
         return Complex(real - other.real, imag - other.imag);
     }
     
+    /**
+     * @brief Умножение комплексных чисел
+     * @param other Второй множитель
+     * @return Результат умножения
+     * 
+     * Формула: (a+bi)(c+di) = (ac-bd) + (ad+bc)i
+     */
     Complex operator*(const Complex& other) const {
         return Complex(real * other.real - imag * other.imag,
                       real * other.imag + imag * other.real);
     }
     
+    /**
+     * @brief Деление комплексных чисел
+     * @param other Делитель
+     * @return Результат деления
+     * @throw std::runtime_error При делении на ноль
+     * 
+     * Формула: (a+bi)/(c+di) = ((ac+bd)/(c²+d²)) + ((bc-ad)/(c²+d²))i
+     */
     Complex operator/(const Complex& other) const {
         double denominator = other.real * other.real + other.imag * other.imag;
         if (denominator == 0) {
@@ -94,44 +200,100 @@ public:
                       (imag * other.real - real * other.imag) / denominator);
     }
     
-    // Операторы сравнения (сравниваем модули)
+    /**
+     * @brief Оператор "меньше" (сравнение модулей)
+     * @param other Второе комплексное число
+     * @return true если модуль текущего числа меньше модуля other
+     */
     bool operator<(const Complex& other) const {
         return this->modulus() < other.modulus();
     }
     
+    /**
+     * @brief Оператор "больше" (сравнение модулей)
+     * @param other Второе комплексное число
+     * @return true если модуль текущего числа больше модуля other
+     */
     bool operator>(const Complex& other) const {
         return this->modulus() > other.modulus();
     }
     
+    /**
+     * @brief Оператор "меньше или равно" (сравнение модулей)
+     * @param other Второе комплексное число
+     * @return true если модуль текущего числа ≤ модулю other
+     */
     bool operator<=(const Complex& other) const {
         return this->modulus() <= other.modulus();
     }
     
+    /**
+     * @brief Оператор "больше или равно" (сравнение модулей)
+     * @param other Второе комплексное число
+     * @return true если модуль текущего числа ≥ модулю other
+     */
     bool operator>=(const Complex& other) const {
         return this->modulus() >= other.modulus();
     }
     
+    /**
+     * @brief Оператор равенства (сравнение компонентов)
+     * @param other Второе комплексное число
+     * @return true если действительные и мнимые части равны
+     */
     bool operator==(const Complex& other) const {
         return real == other.real && imag == other.imag;
     }
     
+    /**
+     * @brief Оператор неравенства
+     * @param other Второе комплексное число
+     * @return true если числа не равны
+     */
     bool operator!=(const Complex& other) const {
         return !(*this == other);
     }
 };
 
+/**
+ * @struct OperationRecord
+ * @brief Запись об операции для истории вычислений
+ * 
+ * Хранит информацию об одной выполненной операции:
+ * тип операции, операнды и результат.
+ */
 struct OperationRecord {
-    std::string operation;
-    Complex num1;
-    Complex num2;
-    Complex result;
+    std::string operation;  ///< Тип операции (+, -, *, / и т.д.)
+    Complex num1;           ///< Первый операнд
+    Complex num2;           ///< Второй операнд (может быть пустым для унарных операций)
+    Complex result;         ///< Результат операции
     
+    /**
+     * @brief Конструктор для бинарных операций
+     * @param op Тип операции
+     * @param n1 Первый операнд
+     * @param n2 Второй операнд
+     * @param res Результат операции
+     */
     OperationRecord(const std::string& op, const Complex& n1, const Complex& n2, const Complex& res)
         : operation(op), num1(n1), num2(n2), result(res) {}
     
+    /**
+     * @brief Конструктор для унарных операций
+     * @param op Тип операции
+     * @param n1 Операнд
+     * @param res Результат операции
+     */
     OperationRecord(const std::string& op, const Complex& n1, const Complex& res)
         : operation(op), num1(n1), num2(0, 0), result(res) {}
     
+    /**
+     * @brief Вывод информации об операции
+     * 
+     * Формат вывода зависит от типа операции:
+     * - Для унарных: "операция число = результат"
+     * - Для бинарных: "число1 операция число2 = результат"
+     */
     void display() const {
         if (num2.getReal() == 0 && num2.getImag() == 0) {
             std::cout << operation << " " << num1 << " = " << result;
@@ -142,17 +304,32 @@ struct OperationRecord {
     }
 };
 
+/**
+ * @class Calculator
+ * @brief Калькулятор комплексных чисел с историей операций
+ * 
+ * Предоставляет интерфейс для выполнения операций над комплексными числами
+ * и ведения истории выполненных операций.
+ */
 class Calculator {
 private:
-    std::vector<OperationRecord> history;
+    std::vector<OperationRecord> history;  ///< Вектор для хранения истории операций
     
 public:
-    // Добавление записи в историю
+    /**
+     * @brief Добавляет запись в историю операций
+     * @param record Запись для добавления
+     */
     void addToHistory(const OperationRecord& record) {
         history.push_back(record);
     }
     
-    // Просмотр истории операций
+    /**
+     * @brief Просмотр истории операций
+     * 
+     * Выводит все сохраненные операции в порядке их выполнения.
+     * Если история пуста, выводит соответствующее сообщение.
+     */
     void viewHistory() const {
         if (history.empty()) {
             std::cout << "История операций пуста." << std::endl;
@@ -167,12 +344,33 @@ public:
         std::cout << "========================\n" << std::endl;
     }
     
-    // Очистка истории
+    /**
+     * @brief Очистка истории операций
+     * 
+     * Удаляет все записи из истории.
+     */
     void clearHistory() {
         history.clear();
         std::cout << "История операций очищена." << std::endl;
     }
 
+    /**
+     * @brief Основной цикл работы калькулятора
+     * 
+     * Предоставляет интерактивное меню для выбора операций:
+     * 1. Сложение
+     * 2. Вычитание
+     * 3. Умножение
+     * 4. Деление
+     * 5. Инкремент
+     * 6. Декремент
+     * 7. Сравнение модулей
+     * 8. Унарный минус
+     * 9. Вычисление модуля
+     * 10. Просмотр истории
+     * 11. Очистка истории
+     * 0. Выход
+     */
     void performOperations() {
         int choice;
         Complex num1, num2, result;
@@ -296,6 +494,9 @@ public:
     }
     
 private:
+    /**
+     * @brief Вывод меню операций
+     */
     void displayMenu() const {
         std::cout << "\n=== Калькулятор комплексных чисел ===" << std::endl;
         std::cout << "1. Сложение" << std::endl;
@@ -312,6 +513,11 @@ private:
         std::cout << "0. Выход" << std::endl;
     }
     
+    /**
+     * @brief Ввод комплексного числа с консоли
+     * @param prompt Приглашение для ввода
+     * @return Введенное комплексное число
+     */
     Complex inputComplex(const std::string& prompt) {
         double real, imag;
         std::cout << prompt << std::endl;
@@ -322,6 +528,11 @@ private:
         return Complex(real, imag);
     }
     
+    /**
+     * @brief Пауза выполнения программы
+     * 
+     * Ожидает нажатия клавиши Enter для продолжения
+     */
     void pause() {
         std::cout << "\nНажмите Enter для продолжения...";
         std::cin.ignore();
@@ -329,10 +540,23 @@ private:
     }
 };
 
-
+/**
+ * @brief Инициализация статической переменной-счетчика
+ */
 int Complex::count = 0;
 
+/**
+ * @brief Основная функция программы
+ * @return Код завершения программы
+ * 
+ * Демонстрирует работу всех функций программы:
+ * 1. Создание и тестирование объектов Complex
+ * 2. Демонстрация всех перегруженных операторов
+ * 3. Тестирование системы истории операций
+ * 4. Запуск интерактивного режима калькулятора
+ */
 int main() {
+    // Демонстрация создания объектов Complex
     Complex c1(3, 4);
     Complex c2(1, -2);
     Complex c3(3, 4);
@@ -342,28 +566,32 @@ int main() {
     std::cout << "c3 = " << c3 << std::endl;
     std::cout << "Модуль c1 = " << c1.modulus() << std::endl;
 
+    // Тестирование унарных операторов
     std::cout << "\nТест унарных операторов:" << std::endl;
     std::cout << "++c1 = " << ++c1 << std::endl;
     std::cout << "c2-- = " << c2-- << std::endl;
     std::cout << "После c2--: c2 = " << c2 << std::endl;
     std::cout << "-c1 = " << -c1 << std::endl;
 
+    // Тестирование арифметических операторов
     std::cout << "\nТест арифметических операторов:" << std::endl;
     std::cout << "c1 + c2 = " << c1 + c2 << std::endl;
     std::cout << "c1 - c2 = " << c1 - c2 << std::endl;
     std::cout << "c1 * c2 = " << c1 * c2 << std::endl;
     std::cout << "c1 / Complex(2, 0) = " << c1 / Complex(2, 0) << std::endl;
 
+    // Обновление значений после операций
     std::cout << "\nc1 = " << c1 << std::endl;
     std::cout << "c2 = " << c2 << std::endl;
     std::cout << "c3 = " << c3 << std::endl;
     
+    // Тестирование операторов сравнения
     std::cout << "\nТест операторов сравнения (по модулю):" << std::endl;
     std::cout << "c1 < c2: " << (c1 < c2 ? "true" : "false") << std::endl;
     std::cout << "c1 > c2: " << (c1 > c2 ? "true" : "false") << std::endl;
     std::cout << "c1 == c3: " << (c1 == c3 ? "true" : "false") << std::endl;
 
-    // Тестирование с записью в историю
+    // Тестирование системы истории операций
     Calculator calc;
     Complex result = c1 + c2;
     calc.addToHistory(OperationRecord("+", c1, c2, result));
@@ -374,9 +602,10 @@ int main() {
     result = c1 * c2;
     calc.addToHistory(OperationRecord("*", c1, c2, result));
     
-    // Просмотр истории
+    // Просмотр истории операций
     calc.viewHistory();
 
+    // Запуск интерактивного режима калькулятора
     calc.performOperations();
     
     return 0;
